@@ -9,18 +9,68 @@ Anggota Kelompok C08 :
 - 05111940000209 - Refaldyka Galuh Pratama
 
 ### 1. Luffy bersama Zoro berencana membuat peta tersebut dengan kriteria EniesLobby sebagai DNS Server, Jipangu sebagai DHCP Server, Water7 sebagai Proxy Server
+1. Install Bind9 di Enieslobby menggunakan command ```apt-get update``` lalu command ```apt-get install bind9```
+2. Install DHCP Server di Jipangu dengan menggunakan command ```apt-get update``` lalu command ```apt-get install isc-dhcp-server```
+3. Install Squid di Water7 dengan menggunakan command ```apt-get update``` lalu command ```apt-get install squid```
 
 ### 2. Foosha sebagai DHCP Relay
+Install DHCP Relay di Foosha dengan menggunakan command ```apt-get update``` lalu command ```apt-get install isc-dhcp-relay```.
+
+Lalu agar DHCP Relay dapat menerima request dan meneruskannya ke Server, buat konfigurasi pada file ```/etc/default/isc-dhcp-relay``` di dalam foosha menjadi seperti berikut
+![2](https://i.imgur.com/yrP28st.png)
 
 ### 3. Semua client yang ada HARUS menggunakan konfigurasi IP dari DHCP Server. Client yang melalui Switch1 mendapatkan range IP dari 10.18.1.20 - 10.18.1.99 dan 10.18.1.150 - 10.18.1.169
 
+Pada tiap client (Loguetown, Alabasta, Tottoland, Skypie) buat isi konfigurasi interface menjadi berikut:
+```
+auto eth0
+iface eth0 inet dhcp
+```
+
+Pada Jipangu:
+
+1. Buka file ```/etc/default/isc-dhcp-server```
+2. Isikan konfigurasi dengan konfigurasi berikut
+![3.1](https://i.imgur.com/e6Fzfn7.png)
+3. Lalu buka file ```/etc/dhcp/dhcpd.conf```
+4. Buat konfigurasi untuk Switch 1, 2, dan 3 menjadi sebagai berikut
+![3.2](https://i.imgur.com/f8SMZhT.png)
+5. Untuk Range IP ada pada lingkaran merah atas
+
 ### 4. Client yang melalui Switch3 mendapatkan range IP dari 10.18.3.30 - 10.18.3.50
+Pada file yang sama dengan nomor 3 isikan pada konfigurasi switch 3 (lingkaran bawah) menjadi berikut
+
+![4](https://i.imgur.com/f8SMZhT.png)
 
 ### 5. Client mendapatkan DNS dari EniesLobby dan client dapat terhubung dengan internet melalui DNS tersebut.
 
+1. Pada file yang sama dengan nomor 3 isikan pada bagian ```option domain-name-server``` Menjadi berikut
+
+![5.1](https://i.imgur.com/HU63LSW.png)
+
+2. Lalu agar dapat tersambung ke internet, isikan forwarder Pada Enieslobby file ```/etc/bind/named.conf.options``` menjadi berikut
+
+![5.2](https://i.imgur.com/KW4cQAd.png)
+
 ### 6. Lama waktu DHCP server meminjamkan alamat IP kepada Client yang melalui Switch1 selama 6 menit sedangkan pada client yang melalui Switch3 selama 12 menit. Dengan waktu maksimal yang dialokasikan untuk peminjaman alamat IP selama 120 menit.
 
+Pada file yang sama dengan nomor 3, isikan pada bagian ```default-lease-time``` dan ```max-lease-time``` menjadi berikut:
+
+![6](https://i.imgur.com/tEMJSw1.png)
+
 ### 7. Luffy dan Zoro berencana menjadikan Skypie sebagai server untuk jual beli kapal yang dimilikinya dengan alamat IP yang tetap dengan IP 10.18.3.69
+
+1. Pada file yang sama dengan nomor 3, tambahkan konfigurasi Host Skypie menjadi berikut:
+
+![7.1](https://i.imgur.com/X8VhxYl.png)
+
+2. Untuk mengisi bagian ```hardware ethernet``` dapat di cek dengan command ```ip a``` pada Skypie
+
+![7.2](https://i.imgur.com/LFD62un.png)
+
+3. Masukkan pula nomor hardware ethernet tersebut pada konfigurasi interface skypie
+
+![7.3](https://i.imgur.com/ssG2ck4.png)
 
 ### 8. Pada Loguetown, proxy harus bisa diakses dengan nama jualbelikapal.c08.com dengan port yang digunakan adalah 5000
 
